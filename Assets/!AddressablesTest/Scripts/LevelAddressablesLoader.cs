@@ -1,13 +1,14 @@
 using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public class LevelAddressablesLoader : MonoBehaviour
 {
     [Serializable]
     private struct LevelInfo
     {
-        public int Index;
+        public int Id;
         public AssetReference Level;
     }
 
@@ -15,11 +16,13 @@ public class LevelAddressablesLoader : MonoBehaviour
 
     private GameObject _currLevel;
 
-    public void LoadLevel(int index)
+    public void LoadLevel(int id)
     {
-        if (index < 0 || index > _levels.Length) return;
+        id -= 1;
+
+        if (id < 0 || id > _levels.Length) return;
 
         Destroy(_currLevel?.gameObject);
-        _levels[index].Level.InstantiateAsync();
+         _levels[id].Level.InstantiateAsync().Completed += (asyncOperation) => _currLevel = asyncOperation.Result;
     }
 }
