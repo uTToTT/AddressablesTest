@@ -14,6 +14,7 @@ public class LevelAddressablesLoader : MonoBehaviour
 
     [SerializeField] private LevelInfo[] _levels;
 
+    private AssetReference _currLevelAssetReference;
     private GameObject _currLevel;
 
     public void LoadLevel(int id)
@@ -22,7 +23,12 @@ public class LevelAddressablesLoader : MonoBehaviour
 
         if (id < 0 || id > _levels.Length) return;
 
-        Destroy(_currLevel?.gameObject);
-         _levels[id].Level.InstantiateAsync().Completed += (asyncOperation) => _currLevel = asyncOperation.Result;
+        if (_currLevelAssetReference != null)
+        {
+            _currLevelAssetReference?.ReleaseInstance(_currLevel);
+        }
+
+        _levels[id].Level.InstantiateAsync().Completed += (asyncOperation) => _currLevel = asyncOperation.Result;
+        _currLevelAssetReference = _levels[id].Level;
     }
 }
